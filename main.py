@@ -128,8 +128,13 @@ def solve(arquivo):
     return rotas, coord_x_par, coord_y_par, colaboradores_alocados
 
 def processar_arquivos(uploaded_files):
+    # Certifique-se de que o diretório "uploads" exista
+    upload_dir = "uploads"
+    if not os.path.exists(upload_dir):
+        os.makedirs(upload_dir)
+    
     for arquivo in uploaded_files:
-        arquivo_path = os.path.join("uploads", arquivo.name)
+        arquivo_path = os.path.join(upload_dir, arquivo.name)
         with open(arquivo_path, "wb") as f:
             f.write(arquivo.getbuffer())
         
