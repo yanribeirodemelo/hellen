@@ -118,7 +118,7 @@ def solve(arquivo):
             colaboradores_alocados[parada_mais_proxima].append(colaborador)
 
     for i, rota in enumerate(rotas):
-        paradas_invertidas = list(reversed(rota.paradas[1:])) + [1]
+        paradas_invertidas = rota.paradas[::-1]  # Inverte as paradas para exibir em ordem inversa
         st.write(f"************** Rota do veículo {i+1}: {' '.join(map(str, paradas_invertidas))}")
         for parada in paradas_invertidas:
             if parada != 1:
