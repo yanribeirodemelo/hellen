@@ -2,6 +2,7 @@ import streamlit as st
 import os
 import math
 import matplotlib.pyplot as plt
+from collections import defaultdict
 
 class Rota:
     def __init__(self):
