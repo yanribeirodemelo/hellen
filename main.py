@@ -2,7 +2,6 @@ import streamlit as st
 import os
 import math
 import matplotlib.pyplot as plt
-from collections import defaultdict
 
 class Rota:
     def __init__(self):
@@ -32,6 +31,8 @@ def leitortodos(arquivo):
 
 
 def plot_rotas(rotas, coord_x_par, coord_y_par, coord_x_est, coord_y_est, colaboradores_alocados):
+    import matplotlib.pyplot as plt
+
     plt.figure(figsize=(10, 8))
 
     # Plotando as paradas
@@ -48,36 +49,33 @@ def plot_rotas(rotas, coord_x_par, coord_y_par, coord_x_est, coord_y_est, colabo
     colors = ['red', 'purple', 'orange', 'brown', 'pink', 'cyan', 'magenta']
     for i, rota in enumerate(rotas):
         cor = colors[i % len(colors)]
+
+        # Linhas entre as paradas na rota
+        for j in range(len(rota.paradas) - 1):
+            origem = rota.paradas[j] - 1  # Corrigindo indexação para 0
+            destino = rota.paradas[j+1] - 1
+            plt.plot(
+                [coord_x_par[origem], coord_x_par[destino]],
+                [coord_y_par[origem], coord_y_par[destino]],
+                linestyle='-', color=cor, linewidth=2
+            )
+
+        # Linhas do colaborador para as paradas
         for parada in rota.paradas:
-            if parada != 1:
-                for colaborador in colaboradores_alocados[parada]:
-                    # Linha do colaborador para a parada
+            if parada != 1:  # Ignorar o depósito inicial
+                for colaborador in colaboradores_alocados.get(parada, []):
                     plt.plot(
                         [coord_x_est[colaborador-1], coord_x_par[parada-1]],
                         [coord_y_est[colaborador-1], coord_y_par[parada-1]],
                         linestyle='--', color=cor, alpha=0.7
                     )
 
-        # Linhas entre as paradas na rota
-        for j in range(len(rota.paradas) - 1):
-            origem = rota.paradas[j]
-            destino = rota.paradas[j+1]
-            plt.plot(
-                [coord_x_par[origem-1], coord_x_par[destino-1]],
-                [coord_y_par[origem-1], coord_y_par[destino-1]],
-                linestyle='-', color=cor, linewidth=2, label=f'Rota {i+1}' if j == 0 else ""
-            )
-
     plt.legend(loc='best')
-    plt.title("Rotas Geradas")
-    plt.xlabel("Coordenada X")
-    plt.ylabel("Coordenada Y")
+    plt.title('Rotas Formadas')
+    plt.xlabel('Coordenada X')
+    plt.ylabel('Coordenada Y')
     plt.grid(True)
-
-    # Salvar o gráfico como imagem temporária
-    plt.savefig("rotas.png")
-    st.pyplot(plt)  # Exibe o gráfico no Streamlit
-    plt.close()
+    plt.show()
 
 # Função `solve` com plotagem no Streamlit
 def solve(arquivo):
@@ -171,15 +169,24 @@ def solve(arquivo):
     plot_rotas(rotas, coord_x_par, coord_y_par, coord_x_est, coord_y_est, colaboradores_alocados)
     return rotas, coord_x_par, coord_y_par, colaboradores_alocados
 
-
 def processar_arquivos(uploaded_files):
+    # Certifique-se de que o diretório "uploads" exista
+    upload_dir = "uploads"
+    if not os.path.exists(upload_dir):
+        os.makedirs(upload_dir)
+    
     for arquivo in uploaded_files:
-        arquivo_path = os.path.join("uploads", arquivo.name)
+        arquivo_path = os.path.join(upload_dir, arquivo.name)
         with open(arquivo_path, "wb") as f:
             f.write(arquivo.getbuffer())
-       
+        
         rotas, coord_x_par, coord_y_par, colaboradores_alocados = solve(arquivo_path)
         st.success(f"Solução para {arquivo.name} processada!")
+
+        # Adicionando o gráfico das rotas
+        st.header("Gráfico das Rotas Formadas")
+        plot_rotas(rotas, coord_x_par, coord_y_par, coord_x_est, coord_y_est, colaboradores_alocados)
+        st.pyplot(plt)  # Exibe o gráfico gerado
 
 # Interface Streamlit
 st.title("Sistema de Roteirização de Colaboradores")
