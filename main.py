@@ -6,6 +6,7 @@ import re
 import numpy as np
 import matplotlib.pyplot as plt
 import streamlit as st
+from PIL import Image
 
 # =============================================================================
 # Classe que representa uma rota
@@ -187,6 +188,7 @@ def solve(arquivo):
         if rota.paradas[-1] != 1:
             rota.paradas.append(1)
 
+    st.subheader("Solução")
     # Impressão do resultado esperado
     for idx, rota in enumerate(best_rotas, start=1):
         rota_str = " ".join(str(s) for s in rota.paradas)
@@ -242,17 +244,25 @@ def plotar_rotas(rotas, coord_x_par, coord_y_par, colaboradores_alocados, coord_
     ax.legend(loc='best')
 
     # Exibindo a figura no Streamlit
+    st.subheader("Visualização Gráfica")
     st.pyplot(fig)
 
 # =============================================================================
 # Interface Streamlit
 # =============================================================================
+#criando 3 colunas
+col1, col2, col3 = st.columns(3)
+foto1 = Image.open('ufpe.png')
+col1.image(foto1, use_column_width=True)
+col2.write("Este aplicativo foi desenvolvido pela mestranda Hellen Souza, sob a orientação do Dr. Raphael Kramer, com o objetivo de otimizar a roteirização de colaboradores em empresas que lidam com atividades logísticas dinâmicas. No qual é especialmente útil para empresas que necessitam gerenciar a contratação de novos funcionários e coordenar operações de forma eficiente, adaptando-se rapidamente a mudanças nas necessidades logísticas.")
+foto2 = Imagem.open('pmd.png')
+col3.image(foto2, use_column_width=True)
 
 # Título
-st.title('Resolução de Problema de Roteamento com Colaboradores')
+st.title('Sistema de Roteirização para Colaboradores')
 
 # Upload de arquivo
-uploaded_file = st.file_uploader("Faça upload de um arquivo de entrada", type=["txt"])
+uploaded_file = st.file_uploader("Faça upload do seu arquivo de entrada", type=["txt"])
 
 if uploaded_file is not None:
     # Salvar o arquivo temporariamente
