@@ -258,4 +258,3 @@ if uploaded_file is not None:
     
     # Plotar as rotas
     plotar_rotas(rotas, coord_x_par, coord_y_par, colaboradores_alocados, coord_x_est, coord_y_est)
-    st.pyplot()
