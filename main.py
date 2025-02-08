@@ -258,12 +258,15 @@ st.set_page_config(
     layout="wide"
 )
 
+# Criando as colunas
 col1, col2, col3 = st.columns(3)
 foto1 = Image.open('ufpe.png')
-col1.image(foto1, use_column_width=True)
+foto1 = foto1.resize((300, 300)) 
+col1.image(foto1, use_column_width=False)
 col2.write("Este aplicativo foi desenvolvido pela mestranda Hellen Souza, sob a orientação do Dr. Raphael Kramer, com o objetivo de otimizar a roteirização de colaboradores em empresas que lidam com atividades logísticas dinâmicas. No qual é especialmente útil para empresas que necessitam gerenciar a contratação de novos funcionários e coordenar operações de forma eficiente, adaptando-se rapidamente a mudanças nas necessidades logísticas.")
 foto2 = Image.open('pmd.png')
-col3.image(foto2, use_column_width=True)
+foto2 = foto2.resize((300, 300))
+col3.image(foto2, use_column_width=False)
 
 # Título
 st.title('Sistema de Roteirização para Colaboradores')
