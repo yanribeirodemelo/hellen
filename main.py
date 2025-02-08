@@ -187,6 +187,19 @@ def solve(arquivo):
         if rota.paradas[-1] != 1:
             rota.paradas.append(1)
 
+    # Impressão do resultado esperado
+    for idx, rota in enumerate(best_rotas, start=1):
+        rota_str = " ".join(str(s) for s in rota.paradas)
+        st.write(f"-> Rota do veículo {idx}: {rota_str}")
+        for parada in rota.paradas:
+            # Na saída Julia, não se imprime o depósito (1) nem o último (length(coord_x_par)+1)
+            if parada != 1 and parada != (len(coord_x_par) + 1):
+                colaboradores_lista = best_colaboradores_alocados.get(parada, [])
+                # Converter os índices de colaboradores para 1-base (somamos 1)
+                colaboradores_imprime = " ".join(str(c + 1) for c in colaboradores_lista)
+                st.write(f"Parada {parada} contém os colaboradores: {colaboradores_imprime}")
+        st.write()
+    st.write(f"Melhor custo encontrado: {best_cost:.3f} (em unidades de comprimento).")
     return best_rotas, coord_x_par, coord_y_par, best_colaboradores_alocados, best_cost, coord_x_est, coord_y_est
 
 def plotar_rotas(rotas, coord_x_par, coord_y_par, colaboradores_alocados, coord_x_est, coord_y_est):
