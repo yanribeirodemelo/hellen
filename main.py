@@ -2,6 +2,7 @@ import os
 import glob
 import math
 import random
+import re
 import numpy as np
 import matplotlib.pyplot as plt
 import streamlit as st
@@ -11,9 +12,9 @@ import streamlit as st
 # =============================================================================
 class Rota:
     def __init__(self, paradas, colaboradores, durationToDepot):
-        self.paradas = paradas              
-        self.colaboradores = colaboradores  
-        self.durationToDepot = durationToDepot  
+        self.paradas = paradas              # lista de paradas (1-baseado)
+        self.colaboradores = colaboradores  # lista de colaboradores (estudantes) alocados nesta rota
+        self.durationToDepot = durationToDepot  # lista de tempos acumulados até o depósito
 
 # =============================================================================
 # Função para ler todos os dados da instância
@@ -24,10 +25,10 @@ def leitortodos(arquivo):
     
     first_line = lines[0]
     parts = first_line.split(',')
-    p = int(parts[0].split()[0])         
-    x = int(parts[1].split()[0])         
-    y = int(parts[2].split()[0])         
-    e = x + y                           
+    p = int(parts[0].split()[0])         # número de stops (contando o depósito – isto vem como 21)
+    x = int(parts[1].split()[0])         # número de old_students
+    y = int(parts[2].split()[0])         # número de new_students
+    e = x + y                           # total de estudantes
     dist_max = float(parts[3].split()[0])
     n = int(parts[4].split()[0])
     
@@ -57,6 +58,7 @@ def leitortodos(arquivo):
 def solve(arquivo):
     p, e, n, dist_max, coord_x_par, coord_y_par, coord_x_est, coord_y_est, vecDistMax_input, vecDurMax_input = leitortodos(arquivo)
     p = p - 1  
+
     DistanciaMax = max(vecDistMax_input)
     DuracaoMax = max(vecDurMax_input)
     FatorDist = 1.0
@@ -86,7 +88,6 @@ def solve(arquivo):
                 else:
                     custo[i, j] = math.sqrt((coord_x_par[i] - coord_x_par[j])**2 +
                                             (coord_y_par[i] - coord_y_par[j])**2)
-
         dist = np.zeros((e, p))
         for i in range(e):
             for j in range(p):
@@ -135,7 +136,7 @@ def solve(arquivo):
                             if duracao <= vecDurMax_input[i] or duracao <= min(FatorDur * vecDurMax_input[i], DuracaoMax):
                                 proximos_filtrados.append(i)
                         if proximos_filtrados:
-                            melhor_parada = idx + 1
+                            melhor_parada = idx + 1  
                             melhor_colaboradores = proximos_filtrados
                             break
                         else:
@@ -160,7 +161,7 @@ def solve(arquivo):
 
             if rota_atual.paradas[0] != 1:
                 rota_atual.paradas.insert(0, 1)
-            custo_atual += custo[0, rota_atual.paradas[0] - 1] 
+            custo_atual += custo[0, rota_atual.paradas[0] - 1]  
             if not rota_atual.colaboradores:
                 break
             rotas.append(rota_atual)
@@ -176,6 +177,7 @@ def solve(arquivo):
                     if parada_mais_proxima not in colaboradores_alocados:
                         colaboradores_alocados[parada_mais_proxima] = []
                     colaboradores_alocados[parada_mais_proxima].append(colaborador)
+
         if custo_da_solucao < best_cost:
             best_cost = custo_da_solucao
             best_rotas = rotas
@@ -185,27 +187,44 @@ def solve(arquivo):
         if rota.paradas[-1] != 1:
             rota.paradas.append(1)
 
-    return best_rotas, coord_x_par, coord_y_par, best_colaboradores_alocados, best_cost
+    return best_rotas, coord_x_par, coord_y_par, best_colaboradores_alocados, best_cost, coord_x_est, coord_y_est
+
+def plotar_rotas(rotas, coord_x_par, coord_y_par, colaboradores_alocados, coord_x_est, coord_y_est):
+    plt.scatter(coord_x_par, coord_y_par, c='lightgray', label='Paradas', marker='o')
+    plt.scatter([50.0], [50.0], color='gray', s=200)  # Ajuste para o depósito
+    for rota in rotas:
+        for i in range(len(rota.paradas) - 1):
+            stop1 = rota.paradas[i]
+            stop2 = rota.paradas[i + 1]
+            plt.plot([coord_x_par[stop1 - 1], coord_x_par[stop2 - 1]], 
+                     [coord_y_par[stop1 - 1], coord_y_par[stop2 - 1]], 'b-')
+    plt.show()
 
 # =============================================================================
-# Função Streamlit para upload e exibição dos resultados
+# Interface Streamlit
 # =============================================================================
-def app():
-    st.title("Resolução de Roteirização de Colaboradores")
-    
-    uploaded_file = st.file_uploader("Escolha um arquivo de instância", type="txt")
-    
-    if uploaded_file is not None:
-        st.text("Arquivo carregado: " + uploaded_file.name)
-        best_rotas, coord_x_par, coord_y_par, best_colaboradores_alocados, best_cost = solve(uploaded_file)
 
-        # Exibição das rotas
-        st.subheader("Resultados das Rotas")
-        for idx, rota in enumerate(best_rotas, start=1):
-            rota_str = " -> ".join(str(s) for s in rota.paradas)
-            st.write(f"Rota do veículo {idx}: {rota_str}")
-            for parada in rota.paradas:
-                if parada != 1 and parada != (len(coord_x_par) + 1):
-                    colaboradores_lista = best_colaboradores_alocados.get(parada, [])
-                    colaboradores_imprime = " ".join(str(c + 1) for c in colaboradores_lista)
-                    st.write(f"Parada {parada} contém os colaboradores: {colaboradores_imprime}")
+# Título
+st.title('Resolução de Problema de Roteamento com Colaboradores')
+
+# Upload de arquivo
+uploaded_file = st.file_uploader("Faça upload de um arquivo de entrada", type=["txt"])
+
+if uploaded_file is not None:
+    # Salvar o arquivo temporariamente
+    with open('input.txt', 'wb') as f:
+        f.write(uploaded_file.read())
+
+    # Executar a solução
+    rotas, coord_x_par, coord_y_par, colaboradores_alocados, best_cost, coord_x_est, coord_y_est = solve('input.txt')
+
+    # Mostrar resultados
+    st.write(f"Custo total da solução: {best_cost}")
+    
+    # Exibir as rotas
+    for i, rota in enumerate(rotas):
+        st.write(f"Rota {i+1}: {rota.paradas}")
+    
+    # Plotar as rotas
+    plotar_rotas(rotas, coord_x_par, coord_y_par, colaboradores_alocados, coord_x_est, coord_y_est)
+    st.pyplot()
