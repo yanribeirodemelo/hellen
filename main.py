@@ -190,15 +190,46 @@ def solve(arquivo):
     return best_rotas, coord_x_par, coord_y_par, best_colaboradores_alocados, best_cost, coord_x_est, coord_y_est
 
 def plotar_rotas(rotas, coord_x_par, coord_y_par, colaboradores_alocados, coord_x_est, coord_y_est):
-    plt.scatter(coord_x_par, coord_y_par, c='lightgray', label='Paradas', marker='o')
-    plt.scatter([50.0], [50.0], color='gray', s=200)  # Ajuste para o depósito
-    for rota in rotas:
-        for i in range(len(rota.paradas) - 1):
-            stop1 = rota.paradas[i]
-            stop2 = rota.paradas[i + 1]
-            plt.plot([coord_x_par[stop1 - 1], coord_x_par[stop2 - 1]], 
-                     [coord_y_par[stop1 - 1], coord_y_par[stop2 - 1]], 'b-')
-    plt.show()
+    # Criar a figura e os eixos
+    fig, ax = plt.subplots(figsize=(10, 8))
+
+    # Plote as paradas
+    ax.scatter(coord_x_par, coord_y_par, c='lightgray', label='Paradas', marker='o')
+    ax.scatter([50.0], [50.0], color='gray', s=200)  # Centro (depósito)
+
+    # Plote as alocações dos colaboradores
+    for parada, colaboradores in colaboradores_alocados.items():
+        # Coleta as coordenadas da parada
+        parada_idx = parada - 1  # Para ajustar o índice da parada
+        x_parada = coord_x_par[parada_idx]
+        y_parada = coord_y_par[parada_idx]
+        
+        # Plote os colaboradores
+        for colaborador in colaboradores:
+            x_est = coord_x_est[colaborador]
+            y_est = coord_y_est[colaborador]
+            ax.plot([x_est, x_parada], [y_est, y_parada], c='black', linestyle='--')  # Linha pontilhada entre colaborador e a parada
+            ax.scatter(x_est, y_est, color='#D3D3D3', s=50)  # Ponto cinza claro (tamanho ajustável)
+
+    # Plote as rotas (linhas conectando as paradas)
+    for idx, rota in enumerate(rotas, start=1):  # Começa a contagem do índice das rotas em 1
+        paradas = rota.paradas
+        x_rotas = [coord_x_par[parada - 1] for parada in paradas]  # Ajusta os índices das paradas
+        y_rotas = [coord_y_par[parada - 1] for parada in paradas]
+        ax.plot(x_rotas, y_rotas, label=f'Rota do veículo {idx}')  # Inclui o número do veículo na legenda
+
+    # Ajuste do gráfico
+    ax.set_xlim(0, 100)  # Define a escala do eixo x
+    ax.set_ylim(0, 100)  # Define a escala do eixo y
+    ax.spines['top'].set_visible(False)  # Remove o eixo superior
+    ax.spines['right'].set_visible(False)  # Remove o eixo direito
+    ax.xaxis.set_ticks_position('bottom')  # Define que os ticks do eixo x aparecem na parte inferior
+    ax.yaxis.set_ticks_position('left')  # Define que os ticks do eixo y aparecem na parte esquerda
+
+    ax.legend(loc='best')
+
+    # Exibindo a figura no Streamlit
+    st.pyplot(fig)
 
 # =============================================================================
 # Interface Streamlit
