@@ -251,6 +251,13 @@ def plotar_rotas(rotas, coord_x_par, coord_y_par, colaboradores_alocados, coord_
 # Interface Streamlit
 # =============================================================================
 #criando 3 colunas
+
+st.set_page_config(
+    page_title="Política de Manutenção",
+    page_icon="foto2.png",
+    layout="wide"
+)
+
 col1, col2, col3 = st.columns(3)
 foto1 = Image.open('ufpe.png')
 col1.image(foto1, use_column_width=True)
