@@ -289,7 +289,7 @@ def main():
 
     if choice == menu[1]:
         st.header(menu[1])
-        st.write('''Este aplicativo foi desenvolvido pela mestranda Hellen Souza, sob a orientação do Dr. Raphael Kramer, com o objetivo de otimizar a roteirização de colaboradores em empresas que lidam com atividades logísticas dinâmicas. No qual é especialmente útil para empresas que necessitam gerenciar a contratação de novos funcionários e coordenar operações de forma eficiente, adaptando-se rapidamente a mudanças nas necessidades logísticas.''')
+        st.write('''Este aplicativo foi desenvolvido pela mestranda Hellen Souza do Programa de Pós-graduação em Engenharia de Produção da Universidade Federal de Pernambuco, sob a orientação do Dr. Raphael Kramer, com o objetivo de otimizar a roteirização de colaboradores em empresas que lidam com atividades logísticas dinâmicas. No qual é especialmente útil para empresas que necessitam gerenciar a contratação de novos funcionários e coordenar operações de forma eficiente, adaptando-se rapidamente a mudanças nas necessidades logísticas.''')
         st.write('''hellen.souza@ufpe.br''')
         st.write('''raphael.kramer@ufpe.br''')
         
