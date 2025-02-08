@@ -291,8 +291,4 @@ def main():
         st.write('''hellen.souza@ufpe.br''')
         st.write('''raphael.kramer@ufpe.br''')
         
-if st._is_running_with_streamlit:
-    main()
-else:
-    sys.argv = ["streamlit", "run", sys.argv[0]]
-    sys.exit(stcli.main())
+main()
