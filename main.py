@@ -18,8 +18,10 @@ def main():
     #criando 3 colunas
     col1, col2, col3 = st.columns(3)
     foto = Image.open('ufpe.png')
+    foto = foto.resize((75, 150))
     #inserindo na coluna 2
     col2.image(foto, use_column_width=True)
+    
     
     st.title('Sistema de Roteirização para Colaboradores')
 
