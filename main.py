@@ -255,3 +255,7 @@ if uploaded_file is not None:
     # Exibir as rotas
     for i, rota in enumerate(rotas):
         st.write(f"Rota {i+1}: {rota.paradas}")
+    
+    # Plotar as rotas
+    plotar_rotas(rotas, coord_x_par, coord_y_par, colaboradores_alocados, coord_x_est, coord_y_est)
+    st.pyplot()
