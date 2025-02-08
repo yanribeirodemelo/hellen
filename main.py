@@ -290,3 +290,9 @@ def main():
         st.write('''Este aplicativo foi desenvolvido pela mestranda Hellen Souza, sob a orientação do Dr. Raphael Kramer, com o objetivo de otimizar a roteirização de colaboradores em empresas que lidam com atividades logísticas dinâmicas. No qual é especialmente útil para empresas que necessitam gerenciar a contratação de novos funcionários e coordenar operações de forma eficiente, adaptando-se rapidamente a mudanças nas necessidades logísticas.''')
         st.write('''hellen.souza@ufpe.br''')
         st.write('''raphael.kramer@ufpe.br''')
+        
+if st._is_running_with_streamlit:
+    main()
+else:
+    sys.argv = ["streamlit", "run", sys.argv[0]]
+    sys.exit(stcli.main())
